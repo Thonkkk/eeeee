@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Archive Website</title>
+  <style>
+    /* CSS styles for the website */
+    body {
+      font-family: Arial, sans-serif;
+      margin: 20px;
+    }
+    h1 {
+      margin-bottom: 20px;
+    }
+    form {
+      margin-bottom: 20px;
+    }
+    input[type="text"],
+    textarea {
+      width: 100%;
+      margin-bottom: 10px;
+    }
+    textarea {
+      height: 100px;
+    }
+    .archive {
+      margin-bottom: 20px;
+      padding: 10px;
+      border: 1px solid #ccc;
+      background-color: #f9f9f9;
+    }
+  </style>
+</head>
+<body>
+  <h1>Archive Website</h1>
+
+  <form id="archive-form">
+    <input type="text" id="username" placeholder="Username" required><br>
+    <textarea id="content" placeholder="Write something..." required></textarea><br>
+    <button type="submit">Save</button>
+  </form>
+
+  <div id="archive-container"></div>
+
+  <script>
+    // Function to generate the current date in the format YYYY-MM-DD
+    function getCurrentDate() {
+      var date = new Date();
+      var year = date.getFullYear();
+      var month = String(date.getMonth() + 1).padStart(2, '0');
+      var day = String(date.getDate()).padStart(2, '0');
+      return year + '-' + month + '-' + day;
+    }
+
+    // Function to save a message to local storage
+    function saveMessage(username, content) {
+      var messages = localStorage.getItem('messages');
+      if (!messages) {
+        messages = [];
+      } else {
+        messages = JSON.parse(messages);
+      }
+      messages.unshift({
+        username: username,
+        date: getCurrentDate(),
+        content: content
+      });
+      localStorage.setItem('messages', JSON.stringify(messages));
+    }
+
+    // Function to load messages from local storage
+    function loadMessages() {
+      var messages = localStorage.getItem('messages');
+      if (messages) {
+        messages = JSON.parse(messages);
+        var archiveContainer = document.getElementById('archive-container');
+        for (var i = 0; i < messages.length; i++) {
+          var message = messages[i];
+          var archiveItem = document.createElement('div');
+          archiveItem.className = 'archive';
+          archiveItem.innerHTML =
+            '<strong>' +
+            message.username +
+            '</strong> (' +
+            message.date +
+            '): ' +
+            message.content;
+          archiveContainer.appendChild(archiveItem);
+        }
+      }
+    }
+
+    // Event listener for the form submission
+    document.getElementById('archive-form').addEventListener('submit', function (
+      e
+    ) {
+      e.preventDefault();
+
+      var username = document.getElementById('username').value;
+      var content = document.getElementById('content').value;
+
+      if (username.trim() !== '' && content.trim() !== '') {
+        var archiveItem = document.createElement('div');
+        archiveItem.className = 'archive';
+        archiveItem.innerHTML =
+          '<strong>' +
+          username +
+          '</strong> (' +
+          getCurrentDate() +
+          '): ' +
+          content;
+
+        var archiveContainer = document.getElementById('archive-container');
+        archiveContainer.insertBefore(archiveItem, archiveContainer.firstChild);
+
+        saveMessage(username, content);
+
+        document.getElementById('username').value = '';
+        document.getElementById('content').value = '';
+      }
+    });
+
+    // Load messages when the page loads
+    loadMessages();
+  </script>
+</body>
+</html>
